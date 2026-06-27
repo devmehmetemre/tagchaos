@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TAGCHAOS SMP</title>
+    <!-- Google Fonts: Minecraft havası veren Pixel yazı tipi ve modern fontlar -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -541,6 +543,7 @@
 </head>
 <body>
 
+    <!-- Header / Navbar -->
     <header>
         <div class="container navbar">
             <div class="logo">
@@ -562,6 +565,7 @@
         </div>
     </header>
 
+    <!-- Hero Section -->
     <section class="hero">
         <div class="version-tag"><i class="fa-solid fa-code-branch"></i> JAVA EDITION - 1.8.8 → SON SÜRÜM</div>
         <h1>Kaos <span>başlasın.</span></h1>
@@ -585,6 +589,7 @@
         <div class="scroll-down">Aşağı Kaydır <br> <i class="fa-solid fa-chevron-down" style="margin-top:8px;"></i></div>
     </section>
 
+    <!-- Hakkımızda Section -->
     <section id="hakkimizda" class="container">
         <div class="about-grid">
             <div class="about-left">
@@ -614,6 +619,7 @@
         </div>
     </section>
 
+    <!-- Kurallar Section -->
     <section id="kurallar" style="background-color: rgba(255,255,255,0.01);">
         <div class="container">
             <div class="rules-title-area">
@@ -657,6 +663,7 @@
         </div>
     </section>
 
+    <!-- Nasıl Katılırım Section -->
     <section id="nasil-katilirim" class="container">
         <span class="section-tag">Sunucuya Katıl</span>
         <h2 class="join-title">4 adımda <span>içeride.</span></h2>
@@ -670,7 +677,7 @@
             <div class="step-card">
                 <div class="step-num">02</div>
                 <h3>Çok Oyunculu</h3>
-                <p>Ana menu'den 'Çok Oyunculu' (Multiplayer) seçeneğine tıkla.</p>
+                <p>Ana menüden 'Çok Oyunculu' (Multiplayer) seçeneğine tıkla.</p>
             </div>
             <div class="step-card">
                 <div class="step-num">03</div>
@@ -695,6 +702,7 @@
         </div>
     </section>
 
+    <!-- İletişim & Sosyal Medya -->
     <section id="iletisim" class="social-section">
         <div class="container">
             <span class="section-tag">İletişim & Sosyal</span>
@@ -721,35 +729,39 @@
         </div>
     </section>
 
+    <!-- Footer -->
     <footer>
         <div class="container">
             &copy; 2026 TAGCHAOS SMP. Tüm hakları saklıdır.
         </div>
     </footer>
 
+    <!-- JAVASCRIPT: Garanti ve CORS Engeli Olmayan Sayaç Sistemi -->
     <script>
-        // --- ADRES AYARI ---
-        // Aternos kullanırken SRV kayıtlarını (qzz.io gibi) en kararlı çözen API budur.
-        const SERVER_IP = "252Panda.aternos.me:46125"; 
+        // Aternos ağlarını en kararlı çözen ve tarayıcı engeline takılmayan ana IP
+        const SERVER_IP = "tagchaos.qzz.io"; 
 
         function updateServerStatus() {
-            // Minetools API: Sunucu durumunu hatasız ve hızlı çözen en iyi servis
-            fetch(`https://api.minetools.eu/ping/${SERVER_IP}`)
-                .then(response => response.json())
-                .then(data => {
-                    const topBadge = document.getElementById("top-status-badge");
-                    const topText = document.getElementById("top-status-text");
-                    const heroMeta = document.getElementById("hero-status-meta");
-                    const onlineCountDiv = document.getElementById("online-count");
+            const topBadge = document.getElementById("top-status-badge");
+            const topText = document.getElementById("top-status-text");
+            const heroMeta = document.getElementById("hero-status-meta");
+            const onlineCountDiv = document.getElementById("online-count");
 
-                    // Minetools API'sinde hata yoksa sunucu açıktır
-                    if (!data.error) {
+            // Global MC Altyapısı (CORS Kısıtlaması Bulunmaz ve Hatasız Çözümler)
+            fetch(`https://api.mcstatus.io/v2/status/java/${SERVER_IP}`)
+                .then(response => {
+                    if (!response.ok) throw new Error("Ağ hatası");
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.online === true) {
+                        // Sunucu Aktif ve Sorunsuz Çevrimiçi
                         topBadge.classList.add("online");
                         topText.innerText = `Çevrimiçi (${data.players.online}/${data.players.max})`;
                         heroMeta.innerHTML = `<span style="color:#59ff2b;"><i class="fa-solid fa-circle"></i> Sunucu Aktif (${data.players.online}/${data.players.max})</span>`;
                         onlineCountDiv.innerText = data.players.online;
                     } else {
-                        // Eğer hata fırlatırsa veya kapalıysa tetiklenecek kısım
+                        // Sunucu Kapalı veya Uyku Modunda
                         topBadge.classList.remove("online");
                         topText.innerText = "Çevrimdışı";
                         heroMeta.innerHTML = `<span style="color:#ff477e;"><i class="fa-solid fa-circle"></i> Sunucu Çevrimdışı</span>`;
@@ -757,20 +769,26 @@
                     }
                 })
                 .catch(err => {
-                    console.error("Sayaç güncellenirken bir sorun oluştu:", err);
+                    console.error("Sayaç güncellenirken hata oluştu:", err);
+                    // API geçici yanıt vermezse kilitlemesin, temiz moda çeksin
+                    topBadge.classList.remove("online");
+                    topText.innerText = "Bağlantı Hatası";
+                    heroMeta.innerHTML = `<span style="color:#ff477e;"><i class="fa-solid fa-circle"></i> Durum Alınamadı</span>`;
                 });
         }
 
-        // Sayfa açıldığında ilk kez çalıştır
+        // Sayfa yüklenir yüklenmez ilk tespiti yap
         updateServerStatus();
         
-        // Her 20 saniyede bir arkada otomatik yenilesin
-        setInterval(updateServerStatus, 20000);
+        // Her 25 saniyede bir sayfayı yenilemeden arka planda güncelle
+        setInterval(updateServerStatus, 25000);
 
-        // IP Kopyalama
+        // Panoya Kopyalama İşlevi
         function copyIP() {
             navigator.clipboard.writeText(SERVER_IP).then(() => {
                 alert("Sunucu IP adresi başarıyla kopyalandı: " + SERVER_IP);
+            }).catch(err => {
+                console.error("Kopyalanamadı:", err);
             });
         }
     </script>
